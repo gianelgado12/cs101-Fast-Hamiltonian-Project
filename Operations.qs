@@ -109,26 +109,12 @@ namespace Operations {
     function H2Terms(idxHamiltonian : Int) : (Int[], Int[]) {
         // This is how a user might input the raw data.
         return [
-            ([3], [0]), ([3], [1]), ([3, 3], [0, 1]), ([2, 2], [0, 1]), ([1, 1], [0, 1])
+            ([0, 0], [0, 1]), ([3, 0], [0, 1]), ([0, 3], [0, 1]), ([3, 3], [0, 1]), ([2, 2], [0, 1]), ([1, 1], [0, 1])
         ][idxHamiltonian];
     }
 
-    /// # Summary
-    /// Given an index, returns a description of the corresponding
-    /// term in the Hamiltonian for H₂. Each term is described by
-    /// a pair of integer arrays representing a sparse Pauli operator.
-    ///
-    /// # Example
-    ///	```
-    ///     // Returns ([3], [0]), to represent H₀ ≔ Z₀.
-    ///     let (idxsPaulis, idxsQubits) = H2Terms(0)
-    /// ```
-    function H2Terms(idxHamiltonian : Int) : (Int[], Int[]) {
-        // This is how a user might input the raw data.
-        return [
-            ([3], [0]), ([3], [1]), ([3, 3], [0, 1]), ([2, 2], [0, 1]), ([1, 1], [0, 1])
-        ][idxHamiltonian];
-    }
+    
+    
 
 
     
