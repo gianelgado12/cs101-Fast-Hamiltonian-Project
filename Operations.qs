@@ -109,10 +109,25 @@ namespace Operations {
     function H2Terms(idxHamiltonian : Int) : (Int[], Int[]) {
         // This is how a user might input the raw data.
         return [
-            ([0, 0], [0, 1]), ([3, 0], [0, 1]), ([0, 3], [0, 1]), ([3, 3], [0, 1]), ([2, 2], [0, 1]), ([1, 1], [0, 1])
+            [0, 0], [3, 0], [0, 3], [3, 3], [2, 2], [1, 1]
         ][idxHamiltonian];
     }
 
+    operation sim_ham(ham_idx_strength: (Int, Double)[], step_int : Int , sim_time : Double) : Unit{
+        let paulis = [PauliI, PauliX, PauliY, PauliZ];
+        using(qs = Qubit[2]){
+            let gate_length = Length(ham_idx_strength);
+            for(i in 0..gate_length-1){
+                let gate_idx = ham_idx_strength[i][0];
+                let gate_str = ham_idx_strength[i][1];
+                let pauli1 = paulis[H2Terms(gate_idx)[0]];
+                let pauli2 = paulis[H2Terms(gate_idx)[1]];
+                Exp([pauli1, pauli2], sim_time * gate_str/step_int, qs);
+            }
+            ResetAll(qs);
+        }
+        
+    }  
     
     
 

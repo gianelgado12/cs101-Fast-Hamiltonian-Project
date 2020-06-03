@@ -63,7 +63,7 @@ H2IdentityCoeff = [
             2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, -0.1253, -0.1452, -0.1629, -0.1786, -0.1927, -0.2053, -0.2165, -0.2265, -0.2355, -0.2436, -0.2508, -0.2573, -0.2632, -0.2684, -0.2731, -0.2774, -0.2812, -0.2847, -0.2879, -0.2908, -0.2934, -0.2958, -0.298, -0.3, -0.3018, -0.3035, -0.3051, -0.3066, -0.3079, -0.3092, -0.3104, -0.3115, -0.3125, -0.3135
         ]
 H2Terms = [
-            ([0, 0], [0, 1]), ([3, 0], [0, 1]), ([0, 3], [0, 1]), ([3, 3], [0, 1]), ([2, 2], [0, 1]), ([1, 1], [0, 1])
+            [0, 0], [3, 0], [0, 3], [3, 3], [2, 2], [1, 1]
         ]
         
 def qDrift(bond_ind, sim_time, e_prec):
@@ -76,10 +76,20 @@ def qDrift(bond_ind, sim_time, e_prec):
 
     V = []
     H_probs = np.abs(np.array(H_coeffs)/coeff_sum)
-    print(N)
     for _ in range(int(N)):
         hamIdx = np.random.choice(np.arange(0, len(H_coeffs)), p = H_probs)
-        V.append(H2Terms[hamIdx])
+        V.append((hamIdx, coeff_sum))
     return (V, N)
 
-print(qDrift(2, 30, 0.1))
+def first_order_trot_sizuki(bond_ind, sim_time, e_prec):
+    H_coeffs = H2Coeff[bond_ind]
+    H_coeffs.insert(0, H2IdentityCoeff[bond_ind])
+    m_lambda = np.max(H_coeffs)
+    L = len(H_coeffs)
+    r = np.ceil((L**2 * m_lambda**2 * sim_time**2)/(2*e_prec))
+    V = []
+    for _ in range(r):
+        for i in range(L):
+            V.append((i, H_coeffs[i]))
+    return (V, r)
+print(qDrift(2, 1, 0.1))
