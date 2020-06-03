@@ -4,6 +4,7 @@ namespace Operations {
     open Microsoft.Quantum.Simulation;
     open Microsoft.Quantum.Oracles;
     open Microsoft.Quantum.Characterization;
+    open Microsoft.Quantum.Convert;
 
 
     //For this project we will be using the H2 simulation used in previous lectures and included
@@ -96,33 +97,16 @@ namespace Operations {
     }
 
 
-    /// # Summary
-    /// Given an index, returns a description of the corresponding
-    /// term in the Hamiltonian for H₂. Each term is described by
-    /// a pair of integer arrays representing a sparse Pauli operator.
-    ///
-    /// # Example
-    ///	```
-    ///     // Returns ([3], [0]), to represent H₀ ≔ Z₀.
-    ///     let (idxsPaulis, idxsQubits) = H2Terms(0)
-    /// ```
-    function H2Terms(idxHamiltonian : Int) : (Int[], Int[]) {
-        // This is how a user might input the raw data.
-        return [
-            [0, 0], [3, 0], [0, 3], [3, 3], [2, 2], [1, 1]
-        ][idxHamiltonian];
-    }
-
     operation sim_ham(ham_idx_strength: (Int, Double)[], step_int : Int , sim_time : Double) : Unit{
+        let H2Terms =[[0, 0], [3, 0], [0, 3], [3, 3], [2, 2], [1, 1]];
         let paulis = [PauliI, PauliX, PauliY, PauliZ];
         using(qs = Qubit[2]){
             let gate_length = Length(ham_idx_strength);
             for(i in 0..gate_length-1){
-                let gate_idx = ham_idx_strength[i][0];
-                let gate_str = ham_idx_strength[i][1];
-                let pauli1 = paulis[H2Terms(gate_idx)[0]];
-                let pauli2 = paulis[H2Terms(gate_idx)[1]];
-                Exp([pauli1, pauli2], sim_time * gate_str/step_int, qs);
+                let (gate_idx, gate_str) = ham_idx_strength[i];
+                let pauli1 = paulis[H2Terms[gate_idx][0]];
+                let pauli2 = paulis[H2Terms[gate_idx][1]];
+                Exp([pauli1, pauli2], sim_time* gate_str/IntAsDouble(step_int), qs);
             }
             ResetAll(qs);
         }

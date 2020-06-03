@@ -2,6 +2,7 @@ import qsharp
 import numpy as np
 import random
 import math
+from Operations import sim_ham
 
 H2Coeff = [
             [0.5678, -1.4508, 0.6799, 0.0791, 0.0791],
@@ -73,13 +74,12 @@ def qDrift(bond_ind, sim_time, e_prec):
     coeff_sum = np.sum(np.abs(H_coeffs))
 
     N = np.ceil((2 * (coeff_sum ** 2) * (sim_time**2))/e_prec)
-
     V = []
     H_probs = np.abs(np.array(H_coeffs)/coeff_sum)
     for _ in range(int(N)):
         hamIdx = np.random.choice(np.arange(0, len(H_coeffs)), p = H_probs)
-        V.append((hamIdx, coeff_sum))
-    return (V, N)
+        V.append((int(hamIdx), coeff_sum))
+    return (V, int(N))
 
 def first_order_trot_sizuki(bond_ind, sim_time, e_prec):
     H_coeffs = H2Coeff[bond_ind]
@@ -91,5 +91,7 @@ def first_order_trot_sizuki(bond_ind, sim_time, e_prec):
     for _ in range(r):
         for i in range(L):
             V.append((i, H_coeffs[i]))
-    return (V, r)
-print(qDrift(2, 1, 0.1))
+    return (V, int(r))
+
+V, r = qDrift(2, 1, 0.1)
+sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
