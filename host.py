@@ -100,7 +100,7 @@ bond_idx = 2
 log_e_dom = []
 trot_times = []
 rand_times = []
-for i in np.arange(0, 2, .1):
+for i in np.arange(0, 2, .05):
     e_prec = 10**(-1*i)
     rand_start = time.time()
     V, r = qDrift(bond_idx, sim_time, e_prec)
@@ -116,5 +116,7 @@ for i in np.arange(0, 2, .1):
 
 plt.plot(log_e_dom, rand_times, label='qDrift')
 plt.plot(log_e_dom, trot_times, label='First Order Trotter')
+plt.xlabel("-Log10 Precision")
+plt.ylabel("Run Time")
 plt.legend()
 plt.show()
