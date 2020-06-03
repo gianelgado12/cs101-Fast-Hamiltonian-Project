@@ -2,6 +2,8 @@ import qsharp
 import numpy as np
 import random
 import math
+import time
+import matplotlib.pyplot as plt
 from Operations import sim_ham
 
 H2Coeff = [
@@ -68,9 +70,8 @@ H2Terms = [
         ]
         
 def qDrift(bond_ind, sim_time, e_prec):
-    H_coeffs = H2Coeff[bond_ind]
+    H_coeffs = H2Coeff[bond_ind].copy()
     H_coeffs.insert(0, H2IdentityCoeff[bond_ind])
-    
     coeff_sum = np.sum(np.abs(H_coeffs))
 
     N = np.ceil((2 * (coeff_sum ** 2) * (sim_time**2))/e_prec)
@@ -82,16 +83,38 @@ def qDrift(bond_ind, sim_time, e_prec):
     return (V, int(N))
 
 def first_order_trot_sizuki(bond_ind, sim_time, e_prec):
-    H_coeffs = H2Coeff[bond_ind]
+    H_coeffs = H2Coeff[bond_ind].copy()
     H_coeffs.insert(0, H2IdentityCoeff[bond_ind])
-    m_lambda = np.max(H_coeffs)
+    m_lambda = np.max(np.abs(H_coeffs))
     L = len(H_coeffs)
     r = np.ceil((L**2 * m_lambda**2 * sim_time**2)/(2*e_prec))
+    r = int(r)
     V = []
     for _ in range(r):
         for i in range(L):
             V.append((i, H_coeffs[i]))
-    return (V, int(r))
+    return (V, r)
 
-V, r = qDrift(2, 1, 0.1)
-sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+sim_time = 1
+bond_idx = 2
+log_e_dom = []
+trot_times = []
+rand_times = []
+for i in np.arange(0, 2, .1):
+    e_prec = 10**(-1*i)
+    rand_start = time.time()
+    V, r = qDrift(bond_idx, sim_time, e_prec)
+    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+    rand_end = time.time()
+    trot_start = time.time()
+    V, r = first_order_trot_sizuki(bond_idx, sim_time, e_prec)
+    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+    trot_end = time.time()
+    log_e_dom.append(i)
+    trot_times.append(trot_end-trot_start)
+    rand_times.append(rand_end-rand_start)
+
+plt.plot(log_e_dom, rand_times, label='qDrift')
+plt.plot(log_e_dom, trot_times, label='First Order Trotter')
+plt.legend()
+plt.show()
