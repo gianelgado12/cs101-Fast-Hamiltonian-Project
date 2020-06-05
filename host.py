@@ -146,6 +146,7 @@ num_terms_dom = [1,2,3,4,5,6]
 trot_times = []
 rand_times = []
 
+# Running Simulation with both Trotter and qDrift for various numbers of terms in Hamiltonian
 for i in num_terms_dom:
     e_prec = 0.1
     rand_start = time.time()
