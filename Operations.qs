@@ -6,11 +6,7 @@ namespace Operations {
     open Microsoft.Quantum.Characterization;
     open Microsoft.Quantum.Convert;
 
-    // Terms and coefficients from "Scalable Quantum Simulation of Molecular Energies,"
-    // O'Malley et. al. https://arxiv.org/abs/1512.06860.
-
-    // H ≔ a II + b₀ ZI + b₁ IZ + b₂ ZZ + b₃ YY + b₄ XX
-
+    // Operation that simulates hamiltonian evolution over a given time with prescribed time steps
     operation sim_ham(ham_idx_strength: (Int, Double)[], step_int : Int , sim_time : Double) : Unit{
         let H2Terms =[[PauliI, PauliI], [PauliZ, PauliI], [PauliI, PauliZ], [PauliZ, PauliZ], [PauliY, 
         PauliY], [PauliX, PauliX]];
