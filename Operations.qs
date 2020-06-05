@@ -14,7 +14,7 @@ namespace Operations {
     operation sim_ham(ham_idx_strength: (Int, Double)[], step_int : Int , sim_time : Double) : Unit{
         let H2Terms =[[PauliI, PauliI], [PauliZ, PauliI], [PauliI, PauliZ], [PauliZ, PauliZ], [PauliY, 
         PauliY], [PauliX, PauliX]];
-        let num_runs = 100;
+        let num_runs = 10;
         using(qs = Qubit[2]){
             for (j in 0..num_runs){
                 let gate_length = Length(ham_idx_strength);
