@@ -170,7 +170,7 @@ elif int(arg_list[0]) == 0:
     plt.ylabel("Number of Gates")
     plt.title("Precision Comparison (time)")
     plt.legend()
-    plt.savefig("e_precision_time_comp.png")
+    plt.savefig("./Plots/e_precision_time_comp.png")
     plt.show()
 
     # Plotting result of run time for each protocal against the precision value used
@@ -181,7 +181,7 @@ elif int(arg_list[0]) == 0:
     plt.ylabel("Number of Gates")
     plt.title("Precision Comparison (gates)")
     plt.legend()
-    plt.savefig("e_precision_gates_comp.png")
+    plt.savefig("./Plots/e_precision_gates_comp.png")
     plt.show()
 
 elif int(arg_list[0]) == 1:
@@ -226,7 +226,7 @@ elif int(arg_list[0]) == 1:
     plt.ylabel("Run Time")
     plt.title("Term Number Comparison (time)")
     plt.legend()
-    plt.savefig("num_terms_time_comp.png")
+    plt.savefig("./Plots/num_terms_time_comp.png")
     plt.show()
 
     plt.plot(num_terms_dom, qdrift_gates, label='qDrift')
@@ -235,7 +235,7 @@ elif int(arg_list[0]) == 1:
     plt.ylabel("Number of Gates")
     plt.title("Term Number Comparison (gates)")
     plt.legend()
-    plt.savefig("num_terms_gates_comp.png")
+    plt.savefig("./Plots/num_terms_gates_comp.png")
     plt.show()
 
 elif int(arg_list[0]) == 2:
@@ -279,7 +279,7 @@ elif int(arg_list[0]) == 2:
     plt.ylabel("Run Time")
     plt.title("Simulation Time Comparison (time)")
     plt.legend()
-    plt.savefig("sim_time_time_comp.png")
+    plt.savefig("./Plots/sim_time_time_comp.png")
     plt.show()
 
     # Plotting result of run time for each protocal against the precision value used
@@ -290,5 +290,5 @@ elif int(arg_list[0]) == 2:
     plt.ylabel("Number of Gates")
     plt.title("Simulation Time Comparison (gates)")
     plt.legend()
-    plt.savefig("sim_time_gates_comp.png")
+    plt.savefig("./Plots/sim_time_gates_comp.png")
     plt.show()
