@@ -70,9 +70,14 @@ H2Coeff = [
             [0.0984, 0.0679, 0.3329, 0.1475, 0.1475]
         ]
 
-# Coefficients for the Identity Trandformation portion of the Hamiltonian Decomposition
+# Coefficients for the Identity Transformation portion of the Hamiltonian Decomposition
 H2IdentityCoeff = [
-            2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, -0.1253, -0.1452, -0.1629, -0.1786, -0.1927, -0.2053, -0.2165, -0.2265, -0.2355, -0.2436, -0.2508, -0.2573, -0.2632, -0.2684, -0.2731, -0.2774, -0.2812, -0.2847, -0.2879, -0.2908, -0.2934, -0.2958, -0.298, -0.3, -0.3018, -0.3035, -0.3051, -0.3066, -0.3079, -0.3092, -0.3104, -0.3115, -0.3125, -0.3135
+            2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 
+            0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, 
+            -0.1253, -0.1452, -0.1629, -0.1786, -0.1927, -0.2053, -0.2165, -0.2265, -0.2355, 
+            -0.2436, -0.2508, -0.2573, -0.2632, -0.2684, -0.2731, -0.2774, -0.2812, -0.2847, 
+            -0.2879, -0.2908, -0.2934, -0.2958, -0.298, -0.3, -0.3018, -0.3035, -0.3051, -0.3066, 
+            -0.3079, -0.3092, -0.3104, -0.3115, -0.3125, -0.3135
         ]
 
 # 2-Local gates that make up the complete hamiltonian (0 = Identity, 1 = Pauli X, 2 = Pauli Y, 3 = Pauli Z)
@@ -148,7 +153,7 @@ elif int(arg_list[0]) == 0:
     # Running Simulation with both Trotter and qDrift for various levels of precision
     # and recording time it takes each protocal to run
     for i in log_e_dom:
-        e_prec = 10.0**(-1*i)
+        e_prec = 10.0 ** (-1 * i)
         rand_start = time.time()
         V, r = qDrift(bond_idx, sim_time, e_prec)
         sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
