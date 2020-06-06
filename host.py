@@ -3,6 +3,7 @@ import numpy as np
 import random
 import math
 import time
+import sys
 import matplotlib.pyplot as plt
 from Operations import sim_ham
 
@@ -79,14 +80,22 @@ H2Terms = [
             [0, 0], [3, 0], [0, 3], [3, 3], [2, 2], [1, 1]
         ]
 
+
+
 # Implementation of qDRIFT protocal to contruct simulation circuit from Campbell paper        
 def qDrift(bond_ind, sim_time, e_prec, num_terms = 6):
+
+    # Aquiring Hamiltonian coefficients for given bond_length
     H_coeffs = H2Coeff[bond_ind].copy()
     H_coeffs.insert(0, H2IdentityCoeff[bond_ind])
     H_coeffs = H_coeffs[0:num_terms]
-    coeff_sum = np.sum(np.abs(H_coeffs))
 
+    #Calculating time step to achieve desired precision
+    coeff_sum = np.sum(np.abs(H_coeffs))
     N = np.ceil((2 * (coeff_sum ** 2) * (sim_time**2))/e_prec)
+
+    # Creating list of gate indicies and respective gate strength in the order
+    # they are to be applied in q#
     V = []
     H_probs = np.abs(np.array(H_coeffs)/coeff_sum)
     for _ in range(int(N)):
@@ -96,74 +105,190 @@ def qDrift(bond_ind, sim_time, e_prec, num_terms = 6):
 
 # Implementation of First-Order Trotter-Suzuki compilation of simulation circuit
 def first_order_trot_suzuki(bond_ind, sim_time, e_prec, num_terms = 6):
+
+    # Aquiring Hamiltonian coefficients for given bond_length
     H_coeffs = H2Coeff[bond_ind].copy()
     H_coeffs.insert(0, H2IdentityCoeff[bond_ind])
     H_coeffs = H_coeffs[:num_terms]
 
+    #Calculating time_step to achieve desired precision
     m_lambda = np.max(np.abs(H_coeffs))
     r = np.ceil((num_terms**2 * m_lambda**2 * sim_time**2)/(2*e_prec))
     r = int(r)
+
+    # Creating list of gate indicies and respective gate strength in the order
+    # they are to be applied in q#
     V = []
     for _ in range(r):
         for i in range(num_terms):
             V.append((i, H_coeffs[i]))
     return (V, r)
 
-# Simulation Parameters
-sim_time = 1
-bond_idx = 2
+arg_list = sys.argv[1:]
 
-# Lists to hold simulation data
-log_e_dom = []
-trot_times = []
-rand_times = []
+if len(arg_list) < 1:
+    print("Usage: host.py [Test #]")
 
-# Running Simulation with both Trotter and qDrift for various levels of precision
-for i in np.arange(0, 2, .05):
-    e_prec = 10.0**(-1*i)
-    rand_start = time.time()
-    V, r = qDrift(bond_idx, sim_time, e_prec)
-    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
-    rand_end = time.time()
-    trot_start = time.time()
-    V, r = first_order_trot_suzuki(bond_idx, sim_time, e_prec)
-    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
-    trot_end = time.time()
-    log_e_dom.append(i)
-    trot_times.append(trot_end-trot_start)
-    rand_times.append(rand_end-rand_start)
+elif int(arg_list[0]) == 0:
+    # Simulation Parameters
+    sim_time = 1
+    bond_idx = random.choice(range(len(H2Coeff)))
 
-plt.plot(log_e_dom, rand_times, label='qDrift')
-plt.plot(log_e_dom, trot_times, label='First Order Trotter')
-plt.xlabel("-Log10 Precision")
-plt.ylabel("Run Time")
-plt.legend()
-plt.savefig("e_precision_comp.png")
-plt.show()
+    # Domain of Log precision values to use
+    log_e_dom = np.arange(0, 2, .05)
+
+    # Lists to hold simulation time data
+    trot_times = []
+    rand_times = []
+
+    # List to hold number of gates used
+    trot_gates = []
+    qdrift_gates = []
+
+    # Running Simulation with both Trotter and qDrift for various levels of precision
+    # and recording time it takes each protocal to run
+    for i in log_e_dom:
+        e_prec = 10.0**(-1*i)
+        rand_start = time.time()
+        V, r = qDrift(bond_idx, sim_time, e_prec)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+        rand_end = time.time()
+        qdrift_gates.append(len(V))
+        trot_start = time.time()
+        V, r = first_order_trot_suzuki(bond_idx, sim_time, e_prec)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+        trot_end = time.time()
+        trot_gates.append(len(V))
+        trot_times.append(trot_end-trot_start)
+        rand_times.append(rand_end-rand_start)
+
+    # Plotting result of run time for each protocal against the precision value used
+    # in that run
+    plt.plot(log_e_dom, rand_times, label='qDrift')
+    plt.plot(log_e_dom, trot_times, label='First Order Trotter')
+    plt.xlabel("-Log10 Precision")
+    plt.ylabel("Number of Gates")
+    plt.title("Precision Comparison (time)")
+    plt.legend()
+    plt.savefig("e_precision_time_comp.png")
+    plt.show()
+
+    # Plotting result of run time for each protocal against the precision value used
+    # in that run
+    plt.plot(log_e_dom, qdrift_gates, label='qDrift')
+    plt.plot(log_e_dom, trot_gates, label='First Order Trotter')
+    plt.xlabel("-Log10 Precision")
+    plt.ylabel("Number of Gates")
+    plt.title("Precision Comparison (gates)")
+    plt.legend()
+    plt.savefig("e_precision_gates_comp.png")
+    plt.show()
+
+elif int(arg_list[0]) == 1:
+    # Simulation Parameters
+    sim_time = 1
+    bond_idx = random.choice(range(len(H2Coeff)))
+
+    # Domain of number of terms in hamiltonian to use
+    num_terms_dom = [1,2,3,4,5,6]
+
+    # Lists to hold simulation time data
+    trot_times = []
+    rand_times = []
+
+    # List to hold number of gates used
+    trot_gates = []
+    qdrift_gates = []
+
+    # Running Simulation with both Trotter and qDrift for various numbers of terms in Hamiltonian
+    # and recording the time it takes each protocal to run
+    for i in num_terms_dom:
+        e_prec = 0.1
+        rand_start = time.time()
+        V, r = qDrift(bond_idx, sim_time, e_prec, num_terms=i)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+        rand_end = time.time()
+        qdrift_gates.append(len(V))
+        trot_start = time.time()
+        V, r = first_order_trot_suzuki(bond_idx, sim_time, e_prec, num_terms=i)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
+        trot_end = time.time()
+        trot_gates.append(len(V))
+        trot_times.append(trot_end-trot_start)
+        rand_times.append(rand_end-rand_start)
 
 
-num_terms_dom = [1,2,3,4,5,6]
-trot_times = []
-rand_times = []
+    # Plotting result of run time for each protocal against the number of terms used
+    # in that run
+    plt.plot(num_terms_dom, rand_times, label='qDrift')
+    plt.plot(num_terms_dom, trot_times, label='First Order Trotter')
+    plt.xlabel("Number of Terms in Hamiltonian")
+    plt.ylabel("Run Time")
+    plt.title("Term Number Comparison (time)")
+    plt.legend()
+    plt.savefig("num_terms_time_comp.png")
+    plt.show()
 
-# Running Simulation with both Trotter and qDrift for various numbers of terms in Hamiltonian
-for i in num_terms_dom:
+    plt.plot(num_terms_dom, qdrift_gates, label='qDrift')
+    plt.plot(num_terms_dom, trot_gates, label='First Order Trotter')
+    plt.xlabel("Number of Terms in Hamiltonian")
+    plt.ylabel("Number of Gates")
+    plt.title("Term Number Comparison (gates)")
+    plt.legend()
+    plt.savefig("num_terms_gates_comp.png")
+    plt.show()
+
+elif int(arg_list[0]) == 2:
+    # Simulation Parameters
+    bond_idx = random.choice(range(len(H2Coeff)))
     e_prec = 0.1
-    rand_start = time.time()
-    V, r = qDrift(bond_idx, sim_time, e_prec, num_terms=i)
-    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
-    rand_end = time.time()
-    trot_start = time.time()
-    V, r = first_order_trot_suzuki(bond_idx, sim_time, e_prec, num_terms=i)
-    sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
-    trot_end = time.time()
-    trot_times.append(trot_end-trot_start)
-    rand_times.append(rand_end-rand_start)
 
-plt.plot(num_terms_dom, rand_times, label='qDrift')
-plt.plot(num_terms_dom, trot_times, label='First Order Trotter')
-plt.xlabel("Number of Terms in Hamiltonian")
-plt.ylabel("Run Time")
-plt.legend()
-plt.savefig("num_terms_comp.png")
-plt.show()
+    # Domain of number of terms in hamiltonian to use
+    sim_times = np.linspace(0, 2, 100)
+
+    # Lists to hold simulation time data
+    trot_times = []
+    rand_times = []
+
+    # List to hold number of gates used
+    trot_gates = []
+    qdrift_gates = []
+
+    # Running Simulation with both Trotter and qDrift for various numbers of terms in Hamiltonian
+    # and recording the time it takes each protocal to run
+    for i in sim_times:
+        rand_start = time.time()
+        V, r = qDrift(bond_idx, i, e_prec)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = float(i))
+        rand_end = time.time()
+        trot_start = time.time()
+        qdrift_gates.append(len(V))
+        V, r = first_order_trot_suzuki(bond_idx, i, e_prec)
+        sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = float(i))
+        trot_end = time.time()
+        trot_gates.append(len(V))
+        trot_times.append(trot_end-trot_start)
+        rand_times.append(rand_end-rand_start)
+
+
+    # Plotting result of run time for each protocal against the precision value used
+    # in that run
+    plt.plot(sim_times, rand_times, label='qDrift')
+    plt.plot(sim_times, trot_times, label='First Order Trotter')
+    plt.xlabel("Simulation Time")
+    plt.ylabel("Run Time")
+    plt.title("Simulation Time Comparison (time)")
+    plt.legend()
+    plt.savefig("sim_time_time_comp.png")
+    plt.show()
+
+    # Plotting result of run time for each protocal against the precision value used
+    # in that run
+    plt.plot(sim_times, qdrift_gates, label='qDrift')
+    plt.plot(sim_times, trot_gates, label='First Order Trotter')
+    plt.xlabel("Simulation Time")
+    plt.ylabel("Number of Gates")
+    plt.title("Simulation Time Comparison (gates)")
+    plt.legend()
+    plt.savefig("sim_time_gates_comp.png")
+    plt.show()
