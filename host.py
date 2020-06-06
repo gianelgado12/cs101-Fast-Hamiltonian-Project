@@ -72,7 +72,11 @@ H2Coeff = [
 
 # Coefficients for the Identity Trandformation portion of the Hamiltonian Decomposition
 H2IdentityCoeff = [
-            2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, -0.1253, -0.1452, -0.1629, -0.1786, -0.1927, -0.2053, -0.2165, -0.2265, -0.2355, -0.2436, -0.2508, -0.2573, -0.2632, -0.2684, -0.2731, -0.2774, -0.2812, -0.2847, -0.2879, -0.2908, -0.2934, -0.2958, -0.298, -0.3, -0.3018, -0.3035, -0.3051, -0.3066, -0.3079, -0.3092, -0.3104, -0.3115, -0.3125, -0.3135
+            2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 
+            0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, -0.1253, 
+            -0.1452, -0.1629, -0.1786, -0.1927, -0.2053, -0.2165, -0.2265, -0.2355, -0.2436, -0.2508, 
+            -0.2573, -0.2632, -0.2684, -0.2731, -0.2774, -0.2812, -0.2847, -0.2879, -0.2908, -0.2934, 
+            -0.2958, -0.298, -0.3, -0.3018, -0.3035, -0.3051, -0.3066, -0.3079, -0.3092, -0.3104, -0.3115, -0.3125, -0.3135
         ]
 
 # 2-Local gates that make up the complete hamiltonian (0 = Identity, 1 = Pauli X, 2 = Pauli Y, 3 = Pauli Z)
@@ -167,7 +171,7 @@ elif int(arg_list[0]) == 0:
     plt.plot(log_e_dom, rand_times, label='qDrift')
     plt.plot(log_e_dom, trot_times, label='First Order Trotter')
     plt.xlabel("-Log10 Precision")
-    plt.ylabel("Runtime")
+    plt.ylabel("Number of Gates")
     plt.title("Precision Comparison (time)")
     plt.legend()
     plt.savefig("./Plots/e_precision_time_comp.png")
@@ -218,7 +222,7 @@ elif int(arg_list[0]) == 1:
         rand_times.append(rand_end-rand_start)
 
 
-    # Plotting result of run time for each protocal against the number of terms used
+    # Plotting result of run time for each protocol against the number of terms used
     # in that run
     plt.plot(num_terms_dom, rand_times, label='qDrift')
     plt.plot(num_terms_dom, trot_times, label='First Order Trotter')
@@ -229,7 +233,7 @@ elif int(arg_list[0]) == 1:
     plt.savefig("./Plots/num_terms_time_comp.png")
     plt.show()
 
-    # Plotting result of number of gates each protocal generated against the number of terms used
+    # Plotting result of number of gates each protocol generated against the number of terms used
     # in that run
     plt.plot(num_terms_dom, qdrift_gates, label='qDrift')
     plt.plot(num_terms_dom, trot_gates, label='First Order Trotter')
