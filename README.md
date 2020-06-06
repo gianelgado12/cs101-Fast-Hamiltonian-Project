@@ -1,6 +1,6 @@
 # CS101-Fast-Hamiltonian-Project
 
-This project aims to analyze the complexity of two methods of hamiltonian compilation: First Order Trotter Suzuki and qDRFIT
+This project aims to analyze the complexity of two methods of hamiltonian compilation: First Order Trotter Suzuki and qDRIFT
 
 To run the various tests invoke the host file `host.py` from the command line with the following arguments:
 * `0` - To run precision comparison test
