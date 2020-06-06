@@ -70,7 +70,7 @@ H2Coeff = [
             [0.0984, 0.0679, 0.3329, 0.1475, 0.1475]
         ]
 
-# Coefficients for the Identity Trandformation portion of the Hamiltonian Decomposition
+# Coefficients for the Identity Transformation portion of the Hamiltonian Decomposition
 H2IdentityCoeff = [
             2.8489, 2.1868, 1.7252, 1.3827, 1.1182, 0.9083, 0.7381, 0.5979, 0.4808, 0.3819, 
             0.2976, 0.2252, 0.1626, 0.1083, 0.0609, 0.0193, -0.0172, -0.0493, -0.0778, -0.1029, -0.1253, 
@@ -152,7 +152,7 @@ elif int(arg_list[0]) == 0:
     # Running Simulation with both Trotter and qDrift for various levels of precision
     # and recording time it takes each protocal to run
     for i in log_e_dom:
-        e_prec = 10.0**(-1*i)
+        e_prec = 10.0 ** (-1 * i)
         rand_start = time.time()
         V, r = qDrift(bond_idx, sim_time, e_prec)
         sim_ham.simulate(ham_idx_strength = V, step_int = r, sim_time = 1.0)
