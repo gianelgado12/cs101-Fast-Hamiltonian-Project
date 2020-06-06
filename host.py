@@ -167,7 +167,7 @@ elif int(arg_list[0]) == 0:
     plt.plot(log_e_dom, rand_times, label='qDrift')
     plt.plot(log_e_dom, trot_times, label='First Order Trotter')
     plt.xlabel("-Log10 Precision")
-    plt.ylabel("Number of Gates")
+    plt.ylabel("Runtime")
     plt.title("Precision Comparison (time)")
     plt.legend()
     plt.savefig("./Plots/e_precision_time_comp.png")
