@@ -3,7 +3,8 @@
 \documentclass[letterpaper, 11pt]{article}
 \usepackage{tabularx} % extra features for tabular environment
 \usepackage{amsmath}  % improve math presentation
-\usepackage{graphicx, tipa, caption, subcaption, float, hyperref} % takes care of graphic including machinery
+\usepackage{graphicx, tipa, subcaption, float, hyperref} % takes care of graphic including machinery
+\usepackage[font=small,labelfont=bf]{caption}
 \usepackage[margin=1in,letterpaper]{geometry} % decreases margins
 \usepackage{cite} % takes care of citations
 \usepackage{comment}
@@ -21,9 +22,10 @@
 
 \begin{document}
 
-\title{Compilation for Fast Hamiltonian Simulation \\
-\large \href{https://github.com/gianelgado12/cs101-Fast-Hamiltonian-Project}{GitHub Repository}
+\title{Compilation for Fast Hamiltonian Simulation
+%\\ \large \href{https://github.com/gianelgado12/cs101-Fast-Hamiltonian-Project}{GitHub Repository}
 }
+
 \author{Wenyan Guan, Shubh Agrawal, and Gianluca Delgado}
 \date{\today}
 \maketitle
@@ -34,7 +36,8 @@
 
 
 \section*{Project Overview}
-In this project, we examined the problem of Hamiltonian simulation, which allows us to break down a Hamiltonian into a quantum circuit of elementary gates. The most established protocol in the field are the deterministic Trotter-Suzuki decompositions. Yet it has been shown that randomized compilers can achieve similarly satisfying approximation with lower computational costs. 
+In this project, we examined the problem of Hamiltonian simulation, which allows us to break down a Hamiltonian into a quantum circuit of elementary gates. The most established protocol in the field are the deterministic Trotter-Suzuki decompositions. Yet it has been shown that randomized compilers can achieve similarly satisfying approximation with lower computational costs.
+{\let\thefootnote\relax\footnote{{See code at \href{https://github.com/gianelgado12/cs101-Fast-Hamiltonian-Project}{this GitHub repository}}}}
 
 We studied one specific randomized Hamiltonian simulation protocol, the qDRIFT protocol by Earl Campbell \cite{PhysRevLett.123.070503}. The qDRIFT protocol weights the probability each gate proportional to the corresponding interaction strength in the Hamiltonian. Such design can eliminates the dependence of the gate count on $L$, the number of terms in the Hamiltonian and thus achieve a speed up for various practical simulations for quantum chemistry problem \cite{PhysRevLett.123.070503}.
 
@@ -73,17 +76,17 @@ When the order of decomposition is large, the gate count roughly scales with $\o
 \section*{The qDRIFT Protocol}
 % What is the logic behind your implementation?
 % How did you make use of the quantum programming language?
-The qDRIFT protocol leverages the power of randomized sampling to reduce the dependency on the number of terms in the Hamiltonian in the compilation of the simulation circuit. The protocol employs randomization using \textit{an oracle} (denoted $SAMPLE$) to sample from the set of unitaries that compose the full Hamiltonian. It achieves the desired precision by introducing biases into the probability distribution employed by $SAMPLE$, which is correlated to the strength of the unitaries in the full Hamiltonian expression:
+The qDRIFT protocol leverages the power of randomized sampling to reduce the dependency on the number of terms in the Hamiltonian in the compilation of the simulation circuit. The protocol employs randomization using \textit{an oracle} (denoted SAMPLE) to sample from the set of unitaries that compose the full Hamiltonian. It achieves the desired precision by introducing biases into the probability distribution employed by SAMPLE, which is correlated to the strength of the unitaries in the full Hamiltonian expression:
 \begin{equation}
     p_j = \frac{\abs{h_j}}{\sum_j \abs{h_j}},
 \end{equation}
-where $p_j$ is probability of $SAMPLE$ returning the unitary $H_j$. The desired precision $\epsilon$, the simulation time $t$, and the terms in decomposition $L$ together determine the number of times $N$ that $SAMPLE$ is called. Specifically, we may approximate $N$ with
+where $p_j$ is probability of SAMPLE returning the unitary $H_j$. The desired precision $\epsilon$, the simulation time $t$, and the terms in decomposition $L$ together determine the number of times $N$ that SAMPLE is called. Specifically, we may approximate $N$ with
 \begin{equation}
     N \approx \Big\lceil \frac{2 \lambda^2 t^2}{\epsilon}\Big\rceil
 \end{equation}
 where $\lambda = \sum_j \abs{h_j}$. \smallskip
 
-Each time $SAMPLE$ is called the unitary $e^{-i \tau H_j}$, where $\tau = \frac{t \lambda}{N}$, is appended to the list of unitaries to be performed in the final circuit. Here, $\frac{t}{N}$ can be thought of the time step taken ,over which the unitary is applied, in analogy to the Trotter-Suzuki decomposition; $\lambda$ is the strength of $H_j$ over that time step. We eventually obtain a final circuit with $N$ gates, where the strength of each gate is encapsulated in the number of times it appears in the circuit rather than the factor it appears along side in the exponential (which is uniform for all the gates). Thus, the length the circuit no longer explicitly depends on the number of terms in the hamiltonian decomposition $L$. One might argue that since $N$ depends on $\lambda$, $N$ does depend on $L$ indirectly, yet it can be demonstrated as in \cite{PhysRevLett.123.070503}, that for practical applications $N$ scales like $\order{L}$, which is a significant improvement from the $\order{L^2}$ barrier observed in the Trotter-Suzuki decompositions. 
+Each time SAMPLE is called the unitary $e^{-i \tau H_j}$, where $\tau = \frac{t \lambda}{N}$, is appended to the list of unitaries to be performed in the final circuit. Here, $\frac{t}{N}$ can be thought of the time step taken ,over which the unitary is applied, in analogy to the Trotter-Suzuki decomposition; $\lambda$ is the strength of $H_j$ over that time step. We eventually obtain a final circuit with $N$ gates, where the strength of each gate is encapsulated in the number of times it appears in the circuit rather than the factor it appears along side in the exponential (which is uniform for all the gates). Thus, the length the circuit no longer explicitly depends on the number of terms in the hamiltonian decomposition $L$. One might argue that since $N$ depends on $\lambda$, $N$ does depend on $L$ indirectly, yet it can be demonstrated as in \cite{PhysRevLett.123.070503}, that for practical applications $N$ scales like $\order{L}$, which is a significant improvement from the $\order{L^2}$ barrier observed in the Trotter-Suzuki decompositions. 
 
 The advantage qDRIFT has over higher-order trotter methods is only observable over short simulation times as qDRIFT scales like $\order{t^2}$ while higher order trotter methods scale like $\order{t}$. Thus, qDRIFT holds the most promise in simulating the dynamics of systems over a short time period with a large number of terms in their hamiltonian decompositions. 
 
@@ -93,13 +96,13 @@ Implement the qDRIFT protocol with the following procedures:
 \begin{enumerate}
     \item Sum over the $\abs{h_j}$ values of the decomposed Hamiltonian
     \item Calculate $N$ which determines the strength of each gate in the resulting circuit
-    \item Use the $SAMPLE$ oracle to sample $N$ times from the set of $H_j$ unitaries with corresponding probability $\abs{h_j}$ (suitably normalized)
+    \item Use the SAMPLE oracle to sample $N$ times from the set of $H_j$ unitaries with corresponding probability $\abs{h_j}$ (suitably normalized)
     \item Append each sampled unitary to the final list of gates $V$
 \end{enumerate}
 
 Since qDRIFT does not make use of qubits to generate the circuit, we decided to implement it in Python, see \texttt{qDrift} in \texttt{host.py}. The function return the list of gates $V$ and gate count $N$ to pass on to the Q\# program, \texttt{Operations.qs}, which then perform the simulation. 
 
-The function performing qDRIFT takes in three required (the index used to locate the Hamiltonian decomposition coefficients, the simulation time, and the desired precision) and one optional variable (the number of terms from the Hamiltonian to be used, default is set to full length of decomposition). The function then calculates $\lambda = \sum_j \abs{h_j}$, the number of gates $N$, and the probability distribution for $SAMPLE()$ in constructing the final list. An empty list $V$ is created and a for loop is used to call $SAMPLE()$ $N$ times and append a tuple of the return value of $SAMPLE()$ and $\lambda$ to $V$. Here, $SAMPLE()$ is the numpy operation \texttt{random.choice} which allows one to specify the set that is to be sampled from and the corresponding probabilities for each member of the set. The set we chose to sample from was the range of integers from zero to the number of terms the user specified to be used. These will serve as indices Q\# could then use to select the corresponding hamiltonian terms from an array specified within the Q\# program. Once the for loop has completed its execution the qDRIFT function returns the list $V$ along with the integer $N$.      
+The function performing qDRIFT takes in three required (the index used to locate the Hamiltonian decomposition coefficients, the simulation time, and the desired precision) and one optional variable (the number of terms from the Hamiltonian to be used, default is set to full length of decomposition). The function then calculates $\lambda = \sum_j \abs{h_j}$, the number of gates $N$, and the probability distribution for SAMPLE$()$ in constructing the final list. An empty list $V$ is created and a for loop is used to call SAMPLE$()$ for $N$ times and append a tuple of the return value from SAMPLE$()$ and $\lambda$ to $V$ each time. Here, we define SAMPLE$()$ with \texttt{numpy.random.choice} which allows one to specify the set that is to be sampled from and the corresponding probabilities for each member of the set. The set we chose to sample from was the range of integers from zero to the number of terms the user specified to be used. These will serve as indices Q\# could then use to select the corresponding hamiltonian terms from an array specified within the Q\# program. Once the for loop has completed its execution the qDRIFT function returns the list $V$ along with the integer $N$.      
 
 \section*{Implementing Hamiltonian Simulation}
 Once the qDRIFT function has returned the list $V$ and $N$, these values are passed on to the Q\# function \texttt{sim\_ham} which takes in a list of integer-double tuples which are the index of the local hamiltonian term to be applied and its corresponding strength respectively, an integer that represents how many time steps are to be performed ($N$), and the total simulation time ($t$). \texttt{sim\_ham} then proceeds to initialize two qubits and for each element (j, $\lambda_j$) in $V$ it applies the transformation $e^{i\frac{\lambda_j t}{N} H_j}$ to the two qubits. Note this construction of the \texttt{sim\_ham} function allows one to have a different strength $\lambda_j$ for each $j$ which is taken advantage of when performing the trotter-suzuki decomposition since the strength of each $H_j$ in that case is $h_j$ which varies from term to term. For the purposes of this project the local hamiltonian terms correspond to the dynamics of the electronic structure of H2 and are hard coded at the beginning of \texttt{sim\_ham}.
@@ -108,7 +111,7 @@ Once the qDRIFT function has returned the list $V$ and $N$, these values are pas
 % Describe the tests. Specify the output and the expected output.
 In order to test the validity of our qDRIFT implementation, we compare the time it takes for qDRIFT to compile the gates and simulate the evolution to the time it takes the First Order Trotter-Suzuki method to accomplish the same task given the same simulation parameters (e.g. simulation time, target precision, Hamiltonian decomposition, etc.). We chose three metrics by which we compare the performance of qDRIFT and First Order Trotter: precision of result, number of terms, and simulation runtime.
 
-All three types of test can be run through $\texttt{host.py}$ by using different command line arguments. The test code runs on an inputted set of Hamiltonian Decomposition Coefficients for particular $H_2$ bond lengths randomly chosen for a hard-coded list of such coefficients \texttt{H2Coeff}. The values in \texttt{H2IdentityCoeff} and \texttt{H2Terms} arrays are the corresponding Identity Transformation coefficients and 2-Local gates (0 = \texttt{Identity}, 1 = \texttt{PauliX}, 2 = \texttt{PauliY}, 3 = \texttt{PauliZ}) respectively.
+All three types of test can be run through $\texttt{host.py}$ by using different command line arguments. The test code runs on an inputted set of Hamiltonian Decomposition Coefficients for particular $H_2$ bond lengths randomly chosen for a hard-coded list of such coefficients \texttt{H2Coeff}, which we obtained from this paper \cite{PhysRevX.6.031007}. The values in \texttt{H2IdentityCoeff} and \texttt{H2Terms} arrays are the corresponding Identity Transformation coefficients and 2-Local gates (0 = \texttt{Identity}, 1 = \texttt{PauliX}, 2 = \texttt{PauliY}, 3 = \texttt{PauliZ}) respectively.
 
 The different tests along with the necessary details on running them are listed below. The code returns Usage statements if run incorrectly.
 \begin{itemize}
@@ -137,13 +140,13 @@ All three tests were run; the obtained plots (also included in the \text{Plots} 
 \centering
 \includegraphics[width = 0.6\textwidth]{plots/e_precision_time_comp.png}
 \label{html}
-\caption{Linear-log space plot of the runtime with respect to the precision limit of the simulation. Note that the runtime for qDRIFT grows slower than the Trotter with respect to precision.}
+\caption{Linear-log space plot of runtime with respect to the precision limit of the simulation. Note that the runtime for qDRIFT grows slower than the Trotter method with respect to precision.}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width = 0.6\textwidth]{plots/e_precision_gates_comp.png}
 \label{html}
-\caption{Linear-log space plot of the number of Quantum gates needed for the precision limit of the simulation. Note that this number of gates, which represents the circuit complexity, grows slower for qDRIFT than the Trotter with respect to precision. The curve is also much smoother than that for the runtime, as expected, due to less noise associated with the deterministic process for choosing gates.}
+\caption{Linear-log space plot of the number of quantum gates needed for the precision limit of the simulation. Note that the number of gates, which represents the circuit complexity, grows slower for qDRIFT than for Trotter with respect to precision. The curve is also much smoother than that for the runtime, as expected, due to less noise associated with the deterministic process for choosing gates.}
 \end{figure}
 
 \subsection*{Plots with respect to number of Hamiltonian terms}
@@ -151,13 +154,13 @@ All three tests were run; the obtained plots (also included in the \text{Plots} 
 \centering
 \includegraphics[width = 0.6\textwidth]{plots/num_terms_time_comp.png}
 \label{html}
-\caption{Linear space plot of the runtime with respect to the number of terms in the Hamiltonian being simulated. Note that the runtime for qDRIFT grows slower than the Trotter with respect to the Hamiltonian length, though is much less observable than the other two tests due to the smaller range of independent variable (number of terms) values.}
+\caption{Linear space plot of the runtime with respect to the number of terms in the Hamiltonian being simulated. Note that the runtime for qDRIFT grows slower than the runtime for Trotter with respect to the Hamiltonian length, though it is much less observable than in the other two tests due to the smaller range of independent variable (number of terms) values.}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width = 0.6\textwidth]{plots/num_terms_gates_comp.png}
 \label{html}
-\caption{Linear space plot of the number of gates needed (representing circuit complexity) with respect to the number of terms in the Hamiltonian being simulated. Note that the complexity for qDRIFT seems to grow slower than the Trotter with respect to Hamiltonian length.}
+\caption{Linear space plot of the number of gates needed (representing circuit complexity) with respect to the number of terms in the Hamiltonian being simulated. Note that the complexity for qDRIFT seems to grow slower than the complexity for Trotter with respect to Hamiltonian length.}
 \end{figure}
 
 \subsection*{Plots with respect to simulation time period}
@@ -165,7 +168,7 @@ All three tests were run; the obtained plots (also included in the \text{Plots} 
 \centering
 \includegraphics[width = 0.6\textwidth]{plots/sim_time_time_comp.png}
 \label{html}
-\caption{Linear space plot of the runtime with respect to the time period for which the system is simulated. Note that the runtime for qDRIFT again grows slower than the Trotter with respect to simulation time. There is much more noise associated with the data due to the more dense range of independent variable.}
+\caption{Linear space plot of the runtime with respect to the time period for which the system is simulated. Note that the runtime for qDRIFT again grows slower than Trotter with respect to simulation time. There is much more noise associated with the data due to the more dense range of independent variable.}
 \end{figure}
 \begin{figure}[H]
 \centering
